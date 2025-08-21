@@ -9,7 +9,6 @@
 import Foundation
 @preconcurrency import JavaScriptCore
 
-@MainActor
 public struct Iterator {
     public static let endlessRecurrenceCount = 500
     internal static let rruleContext: JSContext? = {
@@ -25,7 +24,6 @@ public struct Iterator {
     }()
 }
 
-@MainActor
 public extension RecurrenceRule {
     func allOccurrences(endless endlessRecurrenceCount: Int = Iterator.endlessRecurrenceCount) -> [Date] {
         guard let _ = JavaScriptBridge.rrulejs() else {
