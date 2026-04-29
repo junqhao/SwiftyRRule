@@ -1,5 +1,176 @@
 # SwiftyRRule
 
+[English](#english) | [中文](#chinese)
+
+---
+
+<h2 id="english">English</h2>
+
+SwiftyRRule is a Swift library for parsing and generating iCalendar RRule (recurrence rules), based on the JavaScript rrule.js implementation.
+
+Inspired by [RRuleSwift](https://github.com/teambition/RRuleSwift).
+
+## Features
+
+- ✅ Full iCalendar RRule standard support
+- ✅ Swift Package Manager support
+- ✅ All recurrence frequencies: yearly, monthly, weekly, daily, hourly, minutely, secondly
+- ✅ Complex recurrence rules: by weekday, by month day, by year day, by week number, etc.
+- ✅ Inclusion dates (RDATE) and exclusion dates (EXDATE) support
+- ✅ Recurrence end conditions: by count or by end date
+- ✅ Bidirectional conversion between RRule strings and `RecurrenceRule` objects
+- ✅ Get all occurrences within a specified date range
+
+## Installation
+
+### Swift Package Manager
+
+Add the dependency to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/yourusername/SwiftyRRule.git", from: "1.0.0")
+]
+```
+
+Or in Xcode:
+
+1. Select **File** → **Add Package Dependencies...**
+2. Enter the repository URL: `https://github.com/yourusername/SwiftyRRule.git`
+3. Click **Add Package**
+
+## Usage
+
+### Basic Usage
+
+```swift
+import SwiftyRRule
+
+// Create a weekly recurrence rule
+var rule = RecurrenceRule(frequency: .weekly)
+rule.byweekday = [.wednesday, .friday]
+rule.byhour = [8]
+rule.byminute = [20]
+rule.startDate = Date()
+rule.interval = 2
+
+// Convert to RRule string
+let rruleString = rule.toRRuleString()
+// Output: RRULE:FREQ=WEEKLY;INTERVAL=2;BYHOUR=8;BYMINUTE=20;BYDAY=WE,FR
+
+// Get all occurrences
+let dates = rule.allOccurrences(endless: 5)
+```
+
+### Parse from RRule String
+
+```swift
+let rruleString = "RRULE:FREQ=DAILY;INTERVAL=1;COUNT=10"
+if let rule = RecurrenceRule(rruleString: rruleString) {
+    let dates = rule.allOccurrences()
+}
+```
+
+### Get Occurrences in Date Range
+
+```swift
+let startDate = Date()
+let endDate = Calendar.current.date(byAdding: .month, value: 1, to: startDate)!
+
+let occurrences = rule.occurrences(between: startDate, and: endDate)
+```
+
+### Complex Recurrence Rules
+
+```swift
+var rule = RecurrenceRule(frequency: .monthly)
+rule.bymonthday = [1, 15]  // 1st and 15th of each month
+rule.byhour = [9, 18]      // 9 AM and 6 PM
+rule.byminute = [0]
+rule.recurrenceEnd = EKRecurrenceEnd(occurrenceCount: 20)  // Only 20 occurrences
+
+let dates = rule.allOccurrences()
+```
+
+### Include and Exclude Specific Dates
+
+```swift
+var rule = RecurrenceRule(frequency: .daily)
+
+// Add inclusion dates
+rule.rdate = InclusionDate(dates: [specialDate1, specialDate2])
+
+// Add exclusion dates
+rule.exdate = ExclusionDate(dates: [holiday1, holiday2], component: .day)
+
+let dates = rule.allOccurrences()
+```
+
+## RecurrenceRule Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `frequency` | `RecurrenceFrequency` | Recurrence frequency (required) |
+| `interval` | `Int` | Recurrence interval, default is 1 |
+| `firstDayOfWeek` | `EKWeekday` | First day of the week, default is Monday |
+| `startDate` | `Date` | Start date, default is current date |
+| `recurrenceEnd` | `EKRecurrenceEnd?` | Recurrence end condition |
+| `bysetpos` | `[Int]` | Filter by position |
+| `byyearday` | `[Int]` | By year day (1-366 or -1 to -366) |
+| `bymonth` | `[Int]` | By month (1-12) |
+| `byweekno` | `[Int]` | By week number (1-53 or -1 to -53) |
+| `bymonthday` | `[Int]` | By month day (1-31 or -1 to -31) |
+| `byweekday` | `[EKWeekday]` | By day of week |
+| `byhour` | `[Int]` | By hour |
+| `byminute` | `[Int]` | By minute |
+| `bysecond` | `[Int]` | By second |
+| `rdate` | `InclusionDate?` | Inclusion dates |
+| `exdate` | `ExclusionDate?` | Exclusion dates |
+
+## RecurrenceFrequency
+
+Supported recurrence frequencies:
+
+- `.yearly` - Yearly
+- `.monthly` - Monthly
+- `.weekly` - Weekly
+- `.daily` - Daily
+- `.hourly` - Hourly
+- `.minutely` - Minutely
+- `.secondly` - Secondly
+
+## Methods
+
+### RecurrenceRule
+
+- `init(frequency: RecurrenceFrequency)` - Create a rule with specified frequency
+- `init?(rruleString: String)` - Parse from RRule string
+- `toRRuleString() -> String` - Convert to RRule string
+
+### Get Occurrences
+
+- `allOccurrences(endless: Int = 500) -> [Date]` - Get all occurrences
+- `occurrences(between: Date, and: Date, endless: Int = 500) -> [Date]` - Get occurrences within date range
+
+## Requirements
+
+- iOS 15.0+ / macOS 12.0+ / tvOS 15.0+ / watchOS 8.0+
+- Swift 6.1+
+- Xcode 16.0+
+
+## License
+
+SwiftyRRule is released under the MIT license. See [LICENSE](LICENSE) for details.
+
+## Acknowledgements
+
+- [rrule.js](https://github.com/jakubroztocil/rrule) - The underlying JavaScript recurrence rule library
+- [RRuleSwift](https://github.com/teambition/RRuleSwift) - Inspiration
+
+---
+
+<h2 id="chinese">中文</h2>
+
 SwiftyRRule 是一个用于解析和生成 iCalendar RRule（重复规则）的 Swift 库，基于 JavaScript 的 rrule.js 实现。
 
 灵感来源于 [RRuleSwift](https://github.com/teambition/RRuleSwift)。
@@ -100,7 +271,7 @@ rule.exdate = ExclusionDate(dates: [holiday1, holiday2], component: .day)
 let dates = rule.allOccurrences()
 ```
 
-## RecurrenceRule 属性
+## 属性
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
@@ -121,7 +292,7 @@ let dates = rule.allOccurrences()
 | `rdate` | `InclusionDate?` | 包含日期 |
 | `exdate` | `ExclusionDate?` | 排除日期 |
 
-## RecurrenceFrequency
+## 重复频率
 
 支持以下重复频率：
 
